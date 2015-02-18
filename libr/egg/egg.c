@@ -40,14 +40,17 @@ R_API REgg *r_egg_new () {
 R_API int r_egg_add (REgg *a, REggPlugin *foo) {
 	RListIter *iter;
 	RAsmPlugin *h;
-	// TODO: cache foo->name length and use memcmp instead of strcmp
+	size_t len;
 	if (!foo->name)
 		return R_FALSE;
+	len = strlen(foo->name);
 	//if (foo->init)
 	//	foo->init (a->user);
-	r_list_foreach (a->plugins, iter, h)
-		if (!strcmp (h->name, foo->name))
+	r_list_foreach (a->plugins, iter, h) {
+		if (strlen(h->name) < len || 
+				!memcmp (h->name, foo->name, len))
 			return R_FALSE;
+	}
 	r_list_append (a->plugins, foo);
 	return R_TRUE;
 }
